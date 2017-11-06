@@ -7,9 +7,15 @@ res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', function(socket){
+  
   socket.on('box message', function(msg,color){
     io.emit('box message', msg, color);
   });
+
+  socket.on('startButton', function(){
+    io.emit('startButton');
+  });
+
 });
 
 http.listen(80, function(){
