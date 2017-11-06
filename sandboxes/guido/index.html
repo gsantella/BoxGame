@@ -43,7 +43,21 @@
 
   <body>
     <div class="outer">
+
+
+
       <div class="container">
+
+        <div class="row grid">
+          <div class="col s12">
+            <span class="badge red">Guido(<span id="player1count">0</span>)</span>
+            <span class="badge blue">Rich(<span id="player2count">0</span>)</span>
+            <span class="badge green">Guido(<span id="player3count">0</span>)</span>
+            <span class="badge orange">Rich(<span id="player4count">0</span>)</span>
+            <span class="badge yellow">Guido(<span id="player5count">0</span>)</span>
+          </div>
+        </div>
+
         <div class="row grid">
           <div class="col s1 box" id="b11"></div>
           <div class="col s1 box" id="b12"></div>
@@ -112,7 +126,7 @@
 
         <div class="row" id="playerInfo">
           <br>
-          <div class="col s12 box name" id="nameBox">
+          <div class="col s12 name" id="nameBox">
             <h3>Your color is <span id="myColor"></span>!</h3>
           </div>
         </div>
@@ -129,7 +143,7 @@
 
         var socket = io();
 
-        var colorArray = ["red", "blue", "green", "black", "orange", "yellow"];
+        var colorArray = ["yellow", "orange", "green", "blue", "red"];
         var myColor = colorArray[Math.floor(Math.random() * colorArray.length)];
         var white = 'white';
 
@@ -148,7 +162,36 @@
 
         socket.on('box message', function(el, color){
           $('#' + el).css("background-color", color)
+          tallyCurrentResults();
         });
+
+        var tallyCurrentResults = function() {
+            var player5 = 'rgb(255, 255, 0)'; //yellow
+            var player4 = 'rgb(255, 165, 0)'; //orange
+            var player3 = 'rgb(0, 128, 0)'; //green
+            var player2 = 'rgb(0, 0, 255)'; //blue
+            var player1 = 'rgb(255, 0, 0)'; //red
+
+            var player1count = 0;
+            var player2count = 0;
+            var player3count = 0;
+            var player4count = 0;
+            var player5count = 0;
+
+            $('.box').each(function() {
+              if ($(this).css('background-color') == player1) player1count++;
+              if ($(this).css('background-color') == player2) player2count++;
+              if ($(this).css('background-color') == player3) player3count++;
+              if ($(this).css('background-color') == player4) player4count++;
+              if ($(this).css('background-color') == player5) player5count++;
+            });
+
+            $('#player1count').html(player1count);
+            $('#player2count').html(player2count);
+            $('#player3count').html(player3count);
+            $('#player4count').html(player4count);
+            $('#player5count').html(player5count);
+        }
 
       });
     </script>
