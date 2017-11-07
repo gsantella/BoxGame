@@ -11,13 +11,23 @@ io.on('connection', function(socket){
   socket.on('box message', function(msg,color){
     io.emit('box message', msg, color);
   });
-
+  socket.on('startButton', function(){
+    io.emit('startButton');
+  });
   // This is what happens when servers hears that someone started the game.
   socket.on('start message', function() {
     // emit start message to everyone
     io.emit('start message');
     // start the timer
-    var timerElment = document.getElementById('timer')
+    var timer;
+    $("#startClock").click( function() {
+      var counter = 30;
+      if (timer){
+        timer = setInterval(function() {
+          counter--;
+        })
+      }
+    })
     // when timer runs out sent stop message to everyone
     io.emit('stop message');
   });
