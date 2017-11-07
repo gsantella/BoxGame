@@ -17,10 +17,14 @@
         padding-left: 32px;
       }
 
+      .row{
+        margin: auto;
+      }
+
       .box {
         pointer-events: none;
         background-color: #f3f3f3;
-        height: 80px;
+        height: 92px;
         border: 2px solid black;
         margin: 5px;
       }
@@ -30,13 +34,20 @@
         background-color: lime;
       }
 
+      .stopBtn {
+        pointer-events: auto;
+        background-color: red;
+      }
+
       .outer {
-        padding: 80px 0;
+        margin: auto;
         text-align: center;
+        margin-top: 20px
       }
 
       .name {
         text-align: center;
+        margin-top: 20px;
       }
 
       h3 {
@@ -118,11 +129,14 @@
 
         <div class="row" id="playerInfo">
           <br>
+          <div class="col s4 offset-s1 startBtn" id="startBtn">
+            <h3>Start!</h3>
+          </div>
+          <div class="col s4 offset-s2 stopBtn" id="stopBtn">
+            <h3>Stop!</h3>
+          </div>
           <div class="col s12 name" id="nameBox">
             <h3>Your color is <span id="myColor"></span>!</h3>
-          </div>
-          <div class="col s12 startBtn" id="startBtn">
-            <h3>Start!</h3>
           </div>
         </div>
       </div>
@@ -138,10 +152,12 @@
 
         var socket = io();
 
-        var colorArray = ["red", "blue", "green", "black", "orange", "yellow"];
+        var colorArray = ['hotpink', 'blue', 'green', 'black', 'orange', 'yellow'];
         var myColor = colorArray[Math.floor(Math.random() * colorArray.length)];
         var white = 'white';
         var enableBoxClicks = "auto";
+        var disableBoxClicks = "none";
+        var secondsLeft = 3;
 
         $('#myColor').html(myColor);
 
@@ -168,6 +184,7 @@
           $('.startBtn').html('<h3>Game Starting in 3!</h3>');
 
           //look for sychronos javascript timer
+          /*
           setTimeout(function(){
             $('.startBtn').html('<h3>Game Starting in 2!</h3>');
             setTimeout(function(){
@@ -175,12 +192,36 @@
               setTimeout(function(){
                 $('.startBtn').html('<h3>Game Started!</h3>');
                 $('.box').css("pointer-events", enableBoxClicks);
+                $('.startBtn').css("pointer-events", disableBoxClicks);
               }, 1000);
             }, 1000);
           }, 1000);
+        });*/
+
+        while (secondsLeft <= 0) {
+          setInterval(function(){
+            $('.startBtn').html('<h3>Game Starting in ' + secondsLeft + '!</h3>');
+            if (secondsLeft == 0) {
+              $('.startBtn').html('<h3>Game Started!</h3>');
+              $('.box').css("pointer-events", enableBoxClicks);
+              $('.startBtn').css("pointer-events", disableBoxClicks);
+            }
+          }, 1000);
+          secondsLeft = secondsLeft - 1;
+        }
+
+        $('.stopBtn').click(function(){
+          socket.emit('stopButton');
+        });
+
+        socket.on('stopButton', function(){
+          $('.stopBtn').html('<h3>Game Stopped!</h3>');
+          $('.box').css("pointer-events", disableBoxClicks);
+
         });
 
       });
+    });
     </script>
 
   </body>
