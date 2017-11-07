@@ -129,25 +129,28 @@
 
         var socket = io();
 
-
-        var colorArray = ["red", "blue", "green", "orange", "yellow"];
-        var myColor = colorArray[Math.floor(Math.random() * colorArray.length)];
-
-        $('#myColor').html(myColor);
-
-        //if(myColor != 'black'){
-          $('#nameBox').css('background-color', myColor);
-        //} else {
-        //  $('#nameBox').css('background-color', myColor);
-        //  $('#nameBox').css('color', white);
-        //}
-
         $('.box').click(function(){
-          socket.emit('box message', $(this).attr('id'), myColor);
+          socket.emit('box message', $(this).attr('id'), color);
         });
 
         socket.on('box message', function(el, color){
           $('#' + el).css("background-color", color)
+        });
+
+        socket.on('color message', function(color){
+          $('#myColor').html(color);
+          $('#nameBox').css('background-color', color);
+        });
+
+        socket.on('disconnect', (reason) => {
+          var color = $('#myColor').html();
+          socket.emit('color add message', color);
+        });
+
+        socket.on('test', function(colorArrayOriginal){
+          colorArrayOriginal.foreach(function(el){
+            console.log(el);
+          });
         });
 
       });
