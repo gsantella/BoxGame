@@ -18,14 +18,27 @@
       }
 
       .box {
+        pointer-events: none;
         background-color: #f3f3f3;
         height: 80px;
         border: 2px solid black;
         margin: 5px;
       }
 
+      .startBtn {
+        pointer-events: auto;
+        background-color: lime;
+      }
+
+      .stopTimer {
+        pointer-events: auto;
+        background-color: red;
+        color: white;
+      }
+
       .outer {
-        padding: 80px 0;
+        margin: auto;
+        margin-top: 20px;
         text-align: center;
       }
 
@@ -109,13 +122,18 @@
           <div class="col s1 box" id="b510"></div>
           <div class="col s1 box" id="b511"></div>
         </div>
-        <p id="timer">Timer Goes here</p>
 
         <div class="row" id="playerInfo">
           <br>
           <div class="col s12 name" id="nameBox">
             <h3>Your color is <span id="myColor"></span>!</h3>
           </div>
+          <div class="col s6 startBtn" id="startBtn">
+            <h3>Start!</h3>
+          </div>
+          <div class="col s6 stopTimer" id="stopTimer">
+            <h3>StopTimer</h3>
+          <div>
         </div>
       </div>
     </div>
@@ -133,6 +151,7 @@
         var colorArray = ["red", "blue", "green", "black", "orange", "yellow"];
         var myColor = colorArray[Math.floor(Math.random() * colorArray.length)];
         var white = 'white';
+        var enableBoxClicks = "auto";
 
         $('#myColor').html(myColor);
 
@@ -149,6 +168,26 @@
 
         socket.on('box message', function(el, color){
           $('#' + el).css("background-color", color)
+        });
+
+
+        $('.startBtn').click(function(){
+          socket.emit('startButton');
+        });
+
+        socket.on('startButton', function(){
+          $('.startBtn').html('<h3>Game Starting in 3!</h3>');
+          //look for sychronos javascript timer
+          setTimeout(function(){
+            $('.startBtn').html('<h3>Game Starting in 2!</h3>');
+            setTimeout(function(){
+              $('.startBtn').html('<h3>Game Starting in 1!</h3>');
+              setTimeout(function(){
+                $('.startBtn').html('<h3>Game Started!</h3>');
+                $('.box').css("pointer-events", enableBoxClicks);
+              }, 1000);
+            }, 1000);
+          }, 1000);
         });
 
       });
