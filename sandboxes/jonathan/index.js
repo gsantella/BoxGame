@@ -16,7 +16,7 @@ io.on('connection', function(socket){
   var myColor = colorArray.pop();
   socket.emit('color message', myColor);
 
-  socket.on('box message', function(msg){
+  socket.on('box message', function(msg, color){
     io.emit('box message', msg, color);
   });
 
@@ -27,7 +27,12 @@ io.on('connection', function(socket){
   socket.on('disconnect', function() {
     var colorArrayOriginal = ['red', 'blue', 'green', 'orange', 'yellow'];
 
-    socket.emit('test', colorArrayOriginal);
+    console.log('Disconneted');
+    colorArrayOriginal.forEach(function(el) {
+      if(!colorArray.includes(el)) {
+        colorArray.push(el);
+      }
+    });
   });
 });
 
