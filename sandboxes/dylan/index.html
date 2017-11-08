@@ -14,7 +14,7 @@
       }
 
       .grid {
-        padding-left: 32px;
+        padding-left: 41px;
       }
 
       .row{
@@ -32,17 +32,29 @@
       .startBtn {
         pointer-events: auto;
         background-color: lime;
+        width: 220px;
+        height: 65px;
+        position: absolute;
+        left: 30px;
+        top: 150px;
+        height: auto;
       }
 
       .stopBtn {
-        pointer-events: auto;
+        position: absolute;
+        left: 30px;
+        top: 355px;
+        width: 220px;
+        pointer-events: none;
         background-color: red;
+        height: auto;
+        text-align: center;
       }
 
       .outer {
         margin: auto;
         text-align: center;
-        margin-top: 20px
+        margin-top: 30px;
       }
 
       .name {
@@ -59,17 +71,17 @@
   </head>
 
   <body>
+    <div class="sideButtons">
+      <div class="startBtn btn" id="startBtn">
+        <h4>Start!</h4>
+      </div>
+      <div class="col s4 offset-s2 stopBtn btn" id="stopBtn">
+        <h4>Stop!</h4>
+      </div>
+    </div>
 
     <div class="outer">
       <div class="container">
-
-        <div id="modal1" class="modal">
-          <div class="modal-content">
-            <h4>Modal Header</h4>
-            <p>A bunch of text</p>
-          </div>
-        </div>
-
         <div class="row grid">
           <div class="col s1 box" id="b11"></div>
           <div class="col s1 box" id="b12"></div>
@@ -137,21 +149,20 @@
         </div>
 
         <div class="row" id="playerInfo">
-          <br>
-          <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a>
-          <div class="col s4 offset-s1 startBtn" id="startBtn" href="#modal1">
-            <h4>Start!</h4>
-          </div>
-          <div class="col s4 offset-s2 stopBtn" id="stopBtn">
-            <h4>Stop!</h4>
-          </div>
           <div class="col s12 name" id="nameBox">
             <h3>Your color is <span id="myColor"></span>!</h3>
           </div>
         </div>
+
+        <!-- Modal Structure -->
+        <div id="modal1" class="modal">
+          <div class="modal-content">
+            <h4>Game about to start!</h4>
+          </div>
+        </div>
+
       </div>
     </div>
-
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -189,20 +200,50 @@
           socket.emit('startButton');
         });
 
+/*
         socket.on('startButton', function(){
+          $('.modal').modal('open');
           $('.startBtn').html('<h4>Game Starting in 3!</h4>');
-
+          $('.modal-content').html('<h4>Game Starting in 3!</h4>');
           setTimeout(function(){
             $('.startBtn').html('<h4>Game Starting in 2!</h4>');
+            $('.modal-content').html('<h4>Game Starting in 2!</h4>');
             setTimeout(function(){
               $('.startBtn').html('<h4>Game Starting in 1!</h4>');
+              $('.modal-content').html('<h4>Game Starting in 1!</h4>');
+              $('.modal').modal('close');
               setTimeout(function(){
-                $('.startBtn').html('<h4>Game Started!</h4>');
+                $('.startBtn').html('<h4>Started!</h4>');
                 $('.box').css("pointer-events", enableBoxClicks);
+                $('.stopBtn').css("pointer-events", enableBoxClicks);
                 $('.startBtn').css("pointer-events", disableBoxClicks);
               }, 1000);
             }, 1000);
           }, 1000);
+        });
+*/
+
+        var startCountdownSeconds = 3;
+
+        socket.on('startButton', function(){
+          $('.modal').modal('open');
+          var timer = function(){
+            var timer2 = setInterval(function(){
+            $('.startBtn').html('<h4>Game Starting in ' + startCountdownSeconds + '!</h4>');
+            $('.modal-content').html('<h4>Game Starting in ' + startCountdownSeconds +'!</h4>');
+            startCountdownSeconds--;
+            if (startCountdownSeconds == 0)
+            {
+              $('.modal').modal('close');
+              $('.startBtn').html('<h4>Started!</h4>');
+              $('.box').css("pointer-events", enableBoxClicks);
+              $('.stopBtn').css("pointer-events", enableBoxClicks);
+              $('.startBtn').css("pointer-events", disableBoxClicks);
+              clearInterval(timer2);
+            }
+          }, 1000);
+        };
+        timer();
         });
 
         $('.stopBtn').click(function(){
@@ -210,10 +251,16 @@
         });
 
         socket.on('stopButton', function(){
-          $('.stopBtn').html('<h4>Game Stopped!</h4>');
-          $('.startBtn').html('<h4>Game Stopped!</h4>');
+          $('.stopBtn').html('<h4>Stopped!</h4>');
+          $('.startBtn').html('<h4>Stopped!</h4>');
           $('.box').css("pointer-events", disableBoxClicks);
+          $('.stopBtn').css("pointer-events", disableBoxClicks);
 
+        });
+
+        $(document).ready(function(){
+          // the "href" attribute of the modal trigger must specify the modal ID that wants to be triggered
+          $('.modal').modal();
         });
 
       });
