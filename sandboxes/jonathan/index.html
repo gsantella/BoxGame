@@ -130,16 +130,16 @@
         var socket = io();
 
         $('.box').click(function(){
-          socket.emit('box message', $(this).attr('id'), color);
+          socket.emit('box message', $(this).attr('id'));
         });
 
         socket.on('box message', function(el, color){
           $('#' + el).css("background-color", color)
         });
 
-        socket.on('color message', function(color){
-          $('#myColor').html(color);
-          $('#nameBox').css('background-color', color);
+        socket.on('color message', function(myColor){
+          $('#myColor').html(myColor);
+          $('#nameBox').css('background-color', myColor);
         });
 
         socket.on('disconnect', (reason) => {
