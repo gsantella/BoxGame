@@ -30,7 +30,7 @@
         background-color: lime;
       }
 
-      .stopTimer {
+      .stopButton {
         pointer-events: auto;
         background-color: red;
         color: white;
@@ -131,7 +131,7 @@
           <div class="col s6 startBtn" id="startBtn">
             <h3>Start!</h3>
           </div>
-          <div class="col s6 stopTimer" id="stopTimer">
+          <div class="col s6 stopButton" id="stopButton">
             <h3>StopTimer</h3>
           <div>
         </div>
@@ -170,6 +170,9 @@
           $('#' + el).css("background-color", color)
         });
 
+        socket.on('start all message', function(){
+          alert('Start Message received from server');
+        });
 
         $('.startBtn').click(function(){
           socket.emit('startButton');
@@ -185,11 +188,40 @@
               setTimeout(function(){
                 $('.startBtn').html('<h3>Game Started!</h3>');
                 $('.box').css("pointer-events", enableBoxClicks);
+                console.log('Start the countdown timer');
+                //starting the countdown timer
+                endTheGame();
               }, 1000);
             }, 1000);
           }, 1000);
         });
 
+
+
+         $('.stopButton').click(function(){
+          socket.emit('stopButton');
+        });
+
+        socket.on('stopButton', function(){
+          $('.stopButton').html('<h4>Game Stopped!</h4>');
+          $('.startButton').html('<h4>Game Stopped!</h4>');
+          $('.box').css("pointer-events", disableBoxClicks);
+
+        });
+
+        var endTheGame = function() {
+          var count = 10;
+          var timer = setInterval(function() { myTimer() }, 1000);
+
+          function myTimer () {
+
+            console.log(count--);
+            if (count == 0) {
+              console.log('count is ' + count);
+              clearInterval(timer);
+            }
+          }
+        }
       });
     </script>
 
