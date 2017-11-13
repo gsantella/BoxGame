@@ -15,7 +15,7 @@ io.on('connection', function(socket){
 
   // Emits the color to the player
   socket.emit('color message', myColor);
-  
+
   /*
   socket.on('box message', function(msg,color){
     io.emit('box message', msg, color);
@@ -33,6 +33,7 @@ io.on('connection', function(socket){
   });
 
   socket.on('stopButton', function(){
+    colorArray = ['red', 'blue', 'green', 'orange', 'yellow'];
     io.emit('stopButton');
   });
 

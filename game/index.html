@@ -197,6 +197,7 @@
         var socket = io();
         var enableBoxClicks = "auto";
         var disableBoxClicks = "none";
+        //var white = "white";
 
         $('.box').click(function(){
           socket.emit('box message', $(this).attr('id'));
@@ -220,6 +221,7 @@
 
         socket.on('startButton', function(){
           $('.modal').modal('open');
+          $('.box').css("background-color", "white");
           var timer = function(){
             var timer2 = setInterval(function(){
             $('.startBtn').html('<h4>Game Starting in ' + startCountdownSeconds + '!</h4>');
