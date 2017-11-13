@@ -21,7 +21,7 @@ io.on('connection', function(socket){
   socket.on('stopButton', function(){
     io.emit('stopButton');
   });
-  
+
 });
 
 
