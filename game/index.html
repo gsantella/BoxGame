@@ -66,6 +66,14 @@
         margin-top: 17px;
       }
 
+      .countdownTimer {
+        position: absolute;
+        top: 255px;
+        left: 30px;
+        padding: 10px;
+        background-color: magenta;
+      }
+
     </style>
 
   </head>
@@ -75,6 +83,9 @@
       <div class="startBtn btn" id="startBtn">
         <h4>Start!</h4>
       </div>
+      <div class="countdownTimer">
+        <h5>Time Left: </h5>
+      </div>
       <div class="col s4 offset-s2 stopBtn btn" id="stopBtn">
         <h4>Stop!</h4>
       </div>
@@ -82,6 +93,17 @@
 
     <div class="outer">
       <div class="container">
+
+        <div class="row grid">
+          <div class="col s12">
+            <span class="badge red">Red(<span id="player1count">0</span>)</span>
+            <span class="badge blue">Blue(<span id="player2count">0</span>)</span>
+            <span class="badge green">Green(<span id="player3count">0</span>)</span>
+            <span class="badge orange">Orange(<span id="player4count">0</span>)</span>
+            <span class="badge yellow">Yellow(<span id="player5count">0</span>)</span>
+          </div>
+        </div>
+
         <div class="row grid">
           <div class="col s1 box" id="b11"></div>
           <div class="col s1 box" id="b12"></div>
@@ -173,27 +195,21 @@
       $(function () {
 
         var socket = io();
-        var colorArray = ['hotpink', 'blue', 'green', 'black', 'orange', 'yellow'];
-        var myColor = colorArray[Math.floor(Math.random() * colorArray.length)];
-        var white = 'white';
         var enableBoxClicks = "auto";
         var disableBoxClicks = "none";
 
-        $('#myColor').html(myColor);
-
-        if(myColor != 'black'){
-          $('#nameBox').css('background-color', myColor);
-        } else {
-          $('#nameBox').css('background-color', myColor);
-          $('#nameBox').css('color', white);
-        }
-
         $('.box').click(function(){
-          socket.emit('box message', $(this).attr('id'), myColor);
+          socket.emit('box message', $(this).attr('id'));
         });
 
         socket.on('box message', function(el, color){
           $('#' + el).css("background-color", color);
+          tallyCurrentResults();
+        });
+
+        socket.on('color message', function(myColor){
+          $('#myColor').html(myColor);
+          $('#nameBox').css('background-color', myColor);
         });
 
         $('.startBtn').click(function(){
@@ -216,6 +232,8 @@
               $('.box').css("pointer-events", enableBoxClicks);
               $('.stopBtn').css("pointer-events", enableBoxClicks);
               $('.startBtn').css("pointer-events", disableBoxClicks);
+              //starting the countdown timer
+              endTheGame();
               clearInterval(timer2);
             }
           }, 1000);
@@ -232,13 +250,58 @@
           $('.startBtn').html('<h4>Stopped!</h4>');
           $('.box').css("pointer-events", disableBoxClicks);
           $('.stopBtn').css("pointer-events", disableBoxClicks);
-
         });
 
         $(document).ready(function(){
           // the "href" attribute of the modal trigger must specify the modal ID that wants to be triggered
           $('.modal').modal();
         });
+
+        var endTheGame = function() {
+          var count = 10;
+          var gameStopped = false;
+          var timer = setInterval(function() { myTimer() }, 1000);
+          $('.countdownTimer').html('<h5>Time Left: ' + count + '!</h5>');
+          function myTimer () {
+            socket.on('stopButton', function(){
+              gameStopped = true;
+            });
+            console.log(count--);
+            $('.countdownTimer').html('<h5>Time Left: ' + count + '!</h5>');
+            if (count == 0 || gameStopped) {
+              socket.emit('stopButton');
+              clearInterval(timer);
+            }
+          }
+        }
+
+        var tallyCurrentResults = function() {
+            var player5 = 'rgb(255, 255, 0)'; //yellow
+            var player4 = 'rgb(255, 165, 0)'; //orange
+            var player3 = 'rgb(0, 128, 0)'; //green
+            var player2 = 'rgb(0, 0, 255)'; //blue
+            var player1 = 'rgb(255, 0, 0)'; //red
+
+            var player1count = 0;
+            var player2count = 0;
+            var player3count = 0;
+            var player4count = 0;
+            var player5count = 0;
+
+            $('.box').each(function() {
+              if ($(this).css('background-color') == player1) player1count++;
+              if ($(this).css('background-color') == player2) player2count++;
+              if ($(this).css('background-color') == player3) player3count++;
+              if ($(this).css('background-color') == player4) player4count++;
+              if ($(this).css('background-color') == player5) player5count++;
+            });
+
+            $('#player1count').html(player1count);
+            $('#player2count').html(player2count);
+            $('#player3count').html(player3count);
+            $('#player4count').html(player4count);
+            $('#player5count').html(player5count);
+        }
 
       });
     </script>
