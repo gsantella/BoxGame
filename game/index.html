@@ -51,6 +51,17 @@
         text-align: center;
       }
 
+      .joinBtn {
+        pointer-events: auto;
+        background-color: purple;
+        width: 200px;
+        height: 55px;
+        position: absolute;
+        left: 30px;
+        top: 500px;
+        height: auto;
+      }
+
       .outer {
         margin: auto;
         text-align: center;
@@ -88,6 +99,9 @@
       </div>
       <div class="col s4 offset-s2 stopBtn btn" id="stopBtn">
         <h4>Stop!</h4>
+      </div>
+      <div class="col s4 offset-s2 joinBtn btn" id="joinBtn">
+        <h4>Join Game</h4>
       </div>
     </div>
 
@@ -182,6 +196,11 @@
             <h4>Game about to start!</h4>
           </div>
         </div>
+        <div id="modal2" class="modal">
+          <div class="modal-content">
+            <h4>Game is already full</h4>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -200,7 +219,7 @@
         //var white = "white";
 
         $('.box').click(function(){
-          socket.emit('box message', $(this).attr('id'));
+          socket.emit('box message', $(this).attr('id'), $('#myColor').html());
         });
 
         socket.on('box message', function(el, color){
@@ -209,8 +228,20 @@
         });
 
         socket.on('color message', function(myColor){
-          $('#myColor').html(myColor);
-          $('#nameBox').css('background-color', myColor);
+          if (myColor){
+            $('#myColor').html(myColor);
+            $('#nameBox').css('background-color', myColor);
+          }
+          else{
+            console.log('can not join');
+            $('#modal2').modal('open');
+            $('.startBtn').css("pointer-events", disableBoxClicks);
+            $('.stopBtn').css("pointer-events", disableBoxClicks);
+          }
+        });
+
+        $('.joinBtn').click(function(){
+          socket.emit('join message');
         });
 
         $('.startBtn').click(function(){
@@ -220,7 +251,7 @@
         var startCountdownSeconds = 3;
 
         socket.on('startButton', function(){
-          $('.modal').modal('open');
+          $('#modal1').modal('open');
           $('.box').css("background-color", "white");
           var timer = function(){
             var timer2 = setInterval(function(){

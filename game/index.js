@@ -10,18 +10,23 @@ res.sendFile(__dirname + '/index.html');
 
 io.on('connection', function(socket){
 
-  // Gives user the color
-  var myColor = colorArray.pop();
+
 
   // Emits the color to the player
-  socket.emit('color message', myColor);
+  socket.on('join message', function() {
+    // Gives user the color
+    var myColor = colorArray.pop();
+    socket.emit('color message', myColor);
+
+  });
+
 
   /*
   socket.on('box message', function(msg,color){
     io.emit('box message', msg, color);
   });*/
 
-  socket.on('box message', function(msg){
+  socket.on('box message', function(msg, myColor){
     // Emits the bos click to all other sockets
     io.emit('box message', msg, myColor);
 
