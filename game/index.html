@@ -30,7 +30,7 @@
       }
 
       .startBtn {
-        pointer-events: auto;
+        pointer-events: none;
         background-color: lime;
         width: 220px;
         height: 65px;
@@ -53,12 +53,12 @@
 
       .joinBtn {
         pointer-events: auto;
-        background-color: purple;
-        width: 200px;
+        background-color: orange;
+        width: 220px;
         height: 55px;
         position: absolute;
         left: 30px;
-        top: 500px;
+        top: 450px;
         height: auto;
       }
 
@@ -71,6 +71,7 @@
       .name {
         text-align: center;
         margin-top: 20px;
+        display: none;
       }
 
       h3 {
@@ -100,7 +101,7 @@
       <div class="col s4 offset-s2 stopBtn btn" id="stopBtn">
         <h4>Stop!</h4>
       </div>
-      <div class="col s4 offset-s2 joinBtn btn" id="joinBtn">
+      <div class="col s4 offset-s2 joinBtn btn pulse" id="joinBtn">
         <h4>Join Game</h4>
       </div>
     </div>
@@ -197,8 +198,13 @@
           </div>
         </div>
         <div id="modal2" class="modal">
-          <div class="modal-content">
+          <div>
             <h4>Game is already full</h4>
+          </div>
+        </div>
+        <div id="modal3" class="modal">
+          <div class="modal3-content">
+            <h4>Red Won!</h4>
           </div>
         </div>
 
@@ -214,8 +220,10 @@
       $(function () {
 
         var socket = io();
+        var winners = [];
         var enableBoxClicks = "auto";
         var disableBoxClicks = "none";
+        var colorArray = ['red', 'blue', 'green', 'orange', 'yellow'];
         //var white = "white";
 
         $('.box').click(function(){
@@ -230,7 +238,10 @@
         socket.on('color message', function(myColor){
           if (myColor){
             $('#myColor').html(myColor);
-            $('#nameBox').css('background-color', myColor);
+            $('#nameBox').css('background-color', myColor).show();
+            $('.startBtn').css("pointer-events", enableBoxClicks);
+            $('.joinBtn').css("pointer-events", disableBoxClicks);
+            $('.joinBtn').removeClass('pulse');
           }
           else{
             console.log('can not join');
@@ -248,23 +259,26 @@
           socket.emit('startButton');
         });
 
-        var startCountdownSeconds = 3;
+
 
         socket.on('startButton', function(){
+          var startCountdownSeconds = 3;
           $('#modal1').modal('open');
           $('.box').css("background-color", "white");
           var timer = function(){
             var timer2 = setInterval(function(){
-            $('.startBtn').html('<h4>Game Starting in ' + startCountdownSeconds + '!</h4>');
             $('.modal-content').html('<h4>Game Starting in ' + startCountdownSeconds +'!</h4>');
             startCountdownSeconds--;
             if (startCountdownSeconds == 0)
             {
               $('.modal').modal('close');
+              $('.modal-content').html('Game is about to start!');
               $('.startBtn').html('<h4>Started!</h4>');
-              $('.box').css("pointer-events", enableBoxClicks);
-              $('.stopBtn').css("pointer-events", enableBoxClicks);
-              $('.startBtn').css("pointer-events", disableBoxClicks);
+              if($('#myColor').html()) {
+                $('.box').css("pointer-events", enableBoxClicks);
+                $('.stopBtn').css("pointer-events", enableBoxClicks);
+                $('.startBtn').css("pointer-events", disableBoxClicks);
+              }
               //starting the countdown timer
               endTheGame();
               clearInterval(timer2);
@@ -279,10 +293,16 @@
         });
 
         socket.on('stopButton', function(){
-          $('.stopBtn').html('<h4>Stopped!</h4>');
-          $('.startBtn').html('<h4>Stopped!</h4>');
+          $('.stopBtn').html('<h4>Stop!</h4>');
+          $('.startBtn').html('<h4>Start!</h4>');
           $('.box').css("pointer-events", disableBoxClicks);
           $('.stopBtn').css("pointer-events", disableBoxClicks);
+          $('.joinBtn').css("pointer-events", enableBoxClicks);
+          $('.joinBtn').addClass('pulse');
+          $('#nameBox').hide();
+          console.log(winners);
+          $('.modal3-content').html(colorArray[winners[0]]);
+          $('#modal3').modal('open');
         });
 
         $(document).ready(function(){
@@ -334,7 +354,26 @@
             $('#player3count').html(player3count);
             $('#player4count').html(player4count);
             $('#player5count').html(player5count);
+
+            // Determine Winner
+            var results = [];
+            results.push(player1count);
+            results.push(player2count);
+            results.push(player3count);
+            results.push(player4count);
+            results.push(player5count);
+            console.log('Max: ' + Math.max(...results));
+
+            var highestNum = Math.max(...results);
+            winners = [];
+            $.each(results, function(index, value) {
+              if(value === highestNum) {
+                winners.push(index);
+                console.log('Pushing Index: ' + index);
+              }
+            });
         }
+
 
       });
     </script>
