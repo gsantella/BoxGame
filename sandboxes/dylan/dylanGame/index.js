@@ -20,6 +20,10 @@ io.on('connection', function(socket){
 
   });
 
+  socket.on('show players', function(playerColor) {
+    io.emit('show players', playerColor);
+  });
+
 
   /*
   socket.on('box message', function(msg,color){

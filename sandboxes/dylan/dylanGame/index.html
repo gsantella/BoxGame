@@ -90,6 +90,10 @@
         padding-top: 10px;
       }
 
+      .badge {
+        opacity: 0;
+      }
+
     </style>
 
   </head>
@@ -208,7 +212,6 @@
         </div>
         <div id="modal3" class="modal">
           <div class="modal3-content">
-            <h4>Red Won!</h4>
           </div>
         </div>
 
@@ -227,10 +230,13 @@
         var winners = [];
         var enableBoxClicks = "auto";
         var disableBoxClicks = "none";
-        var colorArray = ['Yellow', 'Orange', 'Green', 'Blue', 'Red'];
-        //var white = "white";
+        var colorArray = ['Red', 'Blue', 'Green', 'Orange', 'Yellow'];
+        var playerColor = "";
 
-        $('.box').click(function(){
+        $('.box').css("pointer-events", disableBoxClicks);
+        $('.joinBtn').css("pointer-events", enableBoxClicks);
+
+        $('.box').mouseover(function(){
           socket.emit('box message', $(this).attr('id'), $('#myColor').html());
         });
 
@@ -246,13 +252,42 @@
             $('.startBtn').css("pointer-events", enableBoxClicks);
             $('.joinBtn').css("pointer-events", disableBoxClicks);
             $('.joinBtn').removeClass('pulse');
+            if (myColor == 'yellow') {
+              socket.emit('show players', myColor);
+            } else if(myColor == 'orange') {
+              $('.yellow').css('opacity', 1);
+              socket.emit('show players', myColor);
+            } else if(myColor == 'green') {
+              $('.yellow').css('opacity', 1);
+              $('.orange').css('opacity', 1);
+              socket.emit('show players', myColor);
+            } else if(myColor == 'blue') {
+              $('.yellow').css('opacity', 1);
+              $('.orange').css('opacity', 1);
+              $('.green').css('opacity', 1);
+              socket.emit('show players', myColor);
+            } else if(myColor == 'red') {
+              $('.yellow').css('opacity', 1);
+              $('.orange').css('opacity', 1);
+              $('.green').css('opacity', 1);
+              $('.blue').css('opacity', 1);
+              socket.emit('show players', myColor);
+            } else {
+              console.log('not gonna happen...');
+            }
           }
           else{
             console.log('can not join');
             $('#modal2').modal('open');
+            $('.badge').css('opacity', 1);
             $('.startBtn').css("pointer-events", disableBoxClicks);
             $('.stopBtn').css("pointer-events", disableBoxClicks);
+            $('.box').css("pointer-events", disableBoxClicks);
           }
+        });
+
+        socket.on('show players', function(playerColor) {
+          $('.' + playerColor).css('opacity', 1);
         });
 
         $('.joinBtn').click(function(){
@@ -263,11 +298,11 @@
           socket.emit('startButton');
         });
 
-
-
         socket.on('startButton', function(){
           var startCountdownSeconds = 3;
           $('#modal1').modal('open');
+          $('.joinBtn').css("pointer-events", disableBoxClicks);
+          $('.joinBtn').removeClass('pulse');
           $('.box').css("background-color", "white");
           var timer = function(){
             var timer2 = setInterval(function(){
@@ -304,20 +339,23 @@
           $('.joinBtn').css("pointer-events", enableBoxClicks);
           $('.joinBtn').addClass('pulse');
           $('#nameBox').hide();
-          console.log(winners);
+          $('#myColor').html('');
+          $('.badge').css('opacity', 0);
 
           var winnerList = "";
           var winnerCounter = 0;
-          for (var winner in winners)
+          var winner;
+          $.each (winners, function(key, value)
           {
-            console.log(colorArray[winner]);
+            console.log("HELLLLLLO: " + colorArray[value]);
+            console.log("this is what is in winners: " + value);
             if (winnerCounter == 0) {
-              winnerList += colorArray[winner] + " ";
+              winnerList += colorArray[value] + " ";
             } else {
-              winnerList += "and " +colorArray[winner] + " ";
+              winnerList += "and " + colorArray[value] + " ";
             }
             winnerCounter++;
-          }
+          });
 
           $('.modal3-content').html('<h4>' + winnerList + 'won!</h4>');
           $('#modal3').modal('open');
@@ -329,7 +367,7 @@
         });
 
         var endTheGame = function() {
-          var count = 10;
+          var count = 60;
           var gameStopped = false;
           var timer = setInterval(function() { myTimer() }, 1000);
           $('.countdownTimer').html('<h5>Time Left: ' + count + '!</h5>');
@@ -387,7 +425,6 @@
             $.each(results, function(index, value) {
               if(value === highestNum) {
                 winners.push(index);
-                console.log('Pushing Index: ' + index);
               }
             });
         }
